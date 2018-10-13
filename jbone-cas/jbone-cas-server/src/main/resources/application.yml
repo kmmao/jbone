@@ -28,13 +28,20 @@ cas:
       enabled: true
       #policyPattern: ^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d){8,10}
       reset:
-        text: Reset your password with this link %s
-        subject: Password Reset Request
+        text: 请使用以下链接重置您的密码： %s
+        subject: Jbone重置密码邮件
         from: jbone666@163.com
-        expirationMinutes: 1
+        expirationMinutes: 10
         emailAttribute: mail
         securityQuestionsEnabled: true
         autoLogin: false
+    pac4j:
+      #github三方账号授权登录，可自行修改成自己的id和secret
+      github:
+        id: 151e91b5b0018290a074
+        secret: 3db661368363a8775d7b6bf7603710e6d90f490e
+        profileAttrs.id: id
+        client-name: github
   server:
     name: https://jbone-cas.majunwei.com:8443
     prefix: https://jbone-cas.majunwei.com:8443/cas
@@ -132,6 +139,11 @@ cas:
   slo:
     disabled: false
     asynchronous: true
+  #验证码,申请地址：https://www.google.com/recaptcha/admin (默认关闭，登录太麻烦)
+#  googleRecaptcha:
+#    verifyUrl: https://www.google.com/recaptcha/api/siteverify
+#    siteKey: 6666LcsZ2oUAAAAAMCxIHtsEcWnyUp4NVHEaatCrwUK
+#    secret: 6666LcsZ2oUAAAAAFjw1U8OGVo8R-F3az_FM7uc-m88
 spring:
   http:
     encoding:
@@ -167,10 +179,14 @@ spring:
     properties.mail.smtp.auth: true
     properties.mail.smtp.starttls.enable: true
 
+#取消management安全验证
 management.security.enabled: false
+#单独配置management的context-path
 management.context-path: /status
 management.add-application-context-header: false
+#单独配置监控端口
 management.port: 30003
+#禁用management的ssl
 management.ssl.enabled: false
 
 
@@ -249,11 +265,11 @@ eureka:
       user.password: jbone
     healthcheck.enabled: true
   instance:
-    prefer-ip-address: false
+    prefer-ip-address: true
     instance-id: ${spring.cloud.client.ipAddress}:${server.port}
-    statusPageUrl: http://${spring.cloud.client.ipAddress}:${management.port}/status/info
-    healthCheckUrl: http://${spring.cloud.client.ipAddress}:${management.port}/status/health
-    homePageUrl: http://${spring.cloud.client.ipAddress}:${management.port}/
+#    statusPageUrl: http://${spring.cloud.client.ipAddress}:${management.port}/status/info
+#    healthCheckUrl: http://${spring.cloud.client.ipAddress}:${management.port}/status/health
+#    homePageUrl: http://${spring.cloud.client.ipAddress}:${management.port}/
 #https的健康检测url
 #    secureHealthCheckUrl: http://${spring.cloud.client.ipAddress}:${management.port}/status/health
 #https端口
@@ -278,6 +294,18 @@ feign:
 jbone.rpc.sysServer.feign:
   protocol: http
   name: jbone-sys-server
+
+# info接口返回值
+info:
+  app:
+    name: ${spring.application.name}
+    version: 1.0.0
+  java:
+    version: ${java.version}
+  code:
+    git: https://github.com/417511458/jbone
+    gitee: https://gitee.com/majunwei2017/jbone
+  domain: http://www.majunwei.com
 
 # 不允许静态用户
 staticAuthentication: false
